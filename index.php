@@ -10,10 +10,15 @@
 		<meta name="description" content="This is some stripped down code that will allow you to access tracks from a Soundcloud playlist and play them in an HTML5 audio player." />
 	</head>
 	<body>
-		<audio controls>
-			<source class="mp3" src="#" type="audio/mpeg">
-		Your browser does not support the audio element.
-		</audio>			
+		<div class="musicPlayer">
+			<img src="" class="artwork" />
+			<h2></h2>
+			<a href="">View on SoundCloud</a>
+			<audio controls>
+				<source class="mp3" src="" type="audio/mpeg">
+				<embed class="mp3" height="50" width="100" src="">
+			</audio>	
+		</div>
 		<?php
 		define("CLIENT_ID", "Add client ID here");
 		define("USER_ID", "Add user ID here");
@@ -21,7 +26,7 @@
 		$url = "https://api.soundcloud.com/users/".USER_ID."/playlists.json?client_id=".CLIENT_ID;
 		
 		$curlHandler = curl_init();
-		curl_setopt($curlHandler, CURLOPT_HTTPHEADER, array('Accept: application/xml'));
+		curl_setopt($curlHandler, CURLOPT_HTTPHEADER, array('Accept: application/json'));
 		curl_setopt_array($curlHandler,array(CURLOPT_RETURNTRANSFER => true,
 		CURLOPT_SSL_VERIFYPEER => false,
 		CURLOPT_TIMEOUT => 90,
@@ -39,7 +44,7 @@
 		$response =  $response[0]['tracks'];
 		echo "<ul>\r\n";
 		foreach($response as $song){
-				echo "<li><a href=\"{$song['uri']}/stream?client_id=".CLIENT_ID."\">{$song['title']}</a></li>\r\n"; 
+					echo "<li><a href=\"{$song['uri']}/stream?client_id=".CLIENT_ID."\" data-img=\"{$song['artwork_url']}\" data-link=\"{$song['permalink_url']}\">{$song['title']}</a></li>\r\n"; 
 		}
 		echo "</ul>\r\n";
 		?>
@@ -50,10 +55,10 @@
 		$(function(){
 			$(document).on('click','.music a',function(el) {
 				el.preventDefault();
-			    $('.mp3').attr('src',$(this).attr('href'));
-			    a[0].pause();
-			    a[0].load();
-			    a[0].play();
+				changeTracks($(this).attr('href'));
+				$('.musicPlayer h2').html($(this).text());
+				$('.musicPlayer img').attr('src',$(this).data('img'));
+				$('.musicPlayer a').attr('href',$(this).data('link'));
 			});
 		});
 		</script>
